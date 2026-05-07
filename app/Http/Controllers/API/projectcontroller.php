@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class projectcontroller extends Controller
 {
@@ -23,12 +24,19 @@ class projectcontroller extends Controller
     public function store(Request $request)
     {
         //
-        $request->validate([
-
-            'name' => 'required|max:255',
+        $validator = Validator::make($request->all(),[
+            'name' => 'required|max255',
             'description' => 'nullable|string',
             'due_date' => 'nullable|date'
         ]);
+
+        if ($validator->fails()){
+            return response()->json([
+                'masage' => $validator->errors()
+            ], 400);
+        }
+
+        
         $project =project::create($request->all());
 
         return response()->json($project, 201);
